@@ -6,7 +6,7 @@ import highway.cinema.showing.domain.inventory.ItemType
 internal class DummyInventoryRepository : InventoryRepository {
     override fun getNumberOfAvailableItems(itemType: ItemType): Long {
         return when (itemType) {
-            ItemType.GLASSES -> 100
+            ItemType.GLASSES -> 300
             else -> 1
         }
     }

@@ -12,4 +12,10 @@ interface ShowingRepository {
         showingEndTime: LocalDateTime,
         showingRoom: Room
     ): Boolean
+
+    fun save(showing: Showing): Showing
+
+    fun getById(showingId: String): Showing?
+
+    fun deleteAllShowings()
 }

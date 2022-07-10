@@ -40,7 +40,7 @@ class Showing {
     private var schedulePolicy: SchedulePolicy? = null
 
 
-    private val id: String
+    val id: String
 
     @Version
     private var version: Long? = null
@@ -64,7 +64,7 @@ class Showing {
                 policiesForShowing.schedulePolicy
             )
             showing.scheduleShowing(movie, showingStartTime, showingRoom)
-            return showing
+            return showingRepository.save(showing)
         }
     }
 
@@ -164,7 +164,7 @@ class Showing {
         val canRoomBeReservedInThisTime: () -> Boolean = {
             roomAvailabilityPolicy?.isRoomAvailableFor(
                 showingStartTime,
-                showingStartTime.plusMinutes(movie.durationInMinutes),
+                getEndShowingTimeFrom(showingStartTime, movie),
                 showingRoom
             ) ?: false
         }
@@ -172,7 +172,7 @@ class Showing {
 
         val isAnyShowingAtThisTimeAndRoom: () -> Boolean = {
             this.showingRepository?.isThereAnyShowingWithRoomForSpecifiedTime(
-                showingStartTime, showingStartTime.minusMinutes(movie.durationInMinutes), showingRoom
+                showingStartTime, getEndShowingTimeFrom(showingStartTime, movie), showingRoom
             ) ?: throw UnexpectedException("Showing repository has not been initialized for Showing class")
         }
 
@@ -192,7 +192,7 @@ class Showing {
         val showingEndTime: LocalDateTime = getEndShowingTimeFrom(showingStartTime, movie)
         val isPremiereEndsBeforeRequiredTime: Boolean = showingEndTime.toLocalTime().isBefore(premiereTimeRange.end)
 
-        val premiereRequirementsViolated: Boolean = isPremiereStartAfterRequiredHour && isPremiereEndsBeforeRequiredTime
+        val premiereRequirementsViolated: Boolean = isPremiereStartAfterRequiredHour || isPremiereEndsBeforeRequiredTime
 
         if (premiereRequirementsViolated) {
             throw PremiereScheduledInForbiddenTime.with(premiereTimeRange)
@@ -200,7 +200,8 @@ class Showing {
     }
 
     private fun getEndShowingTimeFrom(
-        showingStartTime: LocalDateTime, movie: Movie
+        showingStartTime: LocalDateTime,
+        movie: Movie
     ) = showingStartTime.plusMinutes(movie.durationInMinutes)
 
     override fun equals(other: Any?): Boolean {

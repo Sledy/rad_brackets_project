@@ -30,6 +30,18 @@ internal class ShowingRepositoryDummy : ShowingRepository {
         }
     }
 
+    override fun save(showing: Showing): Showing {
+        database[showing.id] = showing
+        return showing
+    }
+
+    override fun getById(showingId: String): Showing? {
+        return database[showingId]
+    }
+
+    override fun deleteAllShowings() {
+        database.clear()
+    }
 
     private fun areDatesOverLapping(
         firstDateTimeStart: LocalDateTime,
