@@ -1,10 +1,10 @@
 package highway.cinema.showing.domain.room.infrastructure
 
-import highway.cinema.showing.domain.room.RoomAvailability
-import highway.cinema.showing.domain.room.RoomAvailabilityRepository
+import highway.cinema.showing.domain.room.domain.RoomAvailability
+import highway.cinema.showing.domain.room.domain.RoomAvailabilityRepository
 import java.time.DayOfWeek
 import java.time.LocalTime
-import java.util.*
+import java.util.Arrays
 import java.util.stream.Collectors
 
 internal class RoomAvailabilityRepositoryDummy : RoomAvailabilityRepository {

@@ -1,6 +1,6 @@
 package highway.cinema.showing.domain.inventory.instrastructure
 
-import highway.cinema.showing.domain.inventory.InventoryRepository
+import highway.cinema.showing.domain.inventory.domain.InventoryRepository
 
 class InventoryInfrastructureConfiguration {
 

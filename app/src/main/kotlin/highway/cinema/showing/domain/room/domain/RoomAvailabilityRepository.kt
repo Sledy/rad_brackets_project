@@ -1,4 +1,4 @@
-package highway.cinema.showing.domain.room
+package highway.cinema.showing.domain.room.domain
 
 interface RoomAvailabilityRepository {
 

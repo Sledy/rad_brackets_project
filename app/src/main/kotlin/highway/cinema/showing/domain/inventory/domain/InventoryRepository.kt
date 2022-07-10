@@ -1,4 +1,4 @@
-package highway.cinema.showing.domain.inventory
+package highway.cinema.showing.domain.inventory.domain
 
 interface InventoryRepository {
 

@@ -6,14 +6,14 @@ import highway.cinema.shared.kernel.infrastructure.Version
 import highway.cinema.showing.domain.exception.PremiereScheduledInForbiddenTime
 import highway.cinema.showing.domain.exception.RoomUnavailableException
 import highway.cinema.showing.domain.exception.SchedulingPolicyViolatedException
-import highway.cinema.showing.domain.inventory.Inventory
-import highway.cinema.showing.domain.inventory.ItemType
+import highway.cinema.showing.domain.inventory.domain.Inventory
+import highway.cinema.showing.domain.inventory.domain.ItemType
 import highway.cinema.showing.domain.movie.Movie
 import highway.cinema.showing.domain.policies.PoliciesForShowing
 import highway.cinema.showing.domain.policies.PremierPolicy
 import highway.cinema.showing.domain.policies.SchedulePolicy
-import highway.cinema.showing.domain.room.Room
-import highway.cinema.showing.domain.room.policies.RoomAvailabilityPolicy
+import highway.cinema.showing.domain.room.domain.Room
+import highway.cinema.showing.domain.room.domain.policies.RoomAvailabilityPolicy
 import java.time.LocalDateTime
 import java.util.UUID
 

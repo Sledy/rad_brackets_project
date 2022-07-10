@@ -3,7 +3,7 @@ package highway.cinema.showing.domain.data.loading
 import highway.cinema.showing.domain.Showing
 import highway.cinema.showing.domain.ShowingFactory
 import highway.cinema.showing.domain.movie.Movie
-import highway.cinema.showing.domain.room.Room
+import highway.cinema.showing.domain.room.domain.Room
 import java.time.LocalDateTime
 import java.time.Month
 

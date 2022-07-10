@@ -1,6 +1,6 @@
 package highway.cinema.showing.domain.inventory.exception
 
-import highway.cinema.showing.domain.inventory.ItemType
+import highway.cinema.showing.domain.inventory.domain.ItemType
 
 class InsufficientItemsInInventoryException private constructor(message: String?) : RuntimeException(message) {
 

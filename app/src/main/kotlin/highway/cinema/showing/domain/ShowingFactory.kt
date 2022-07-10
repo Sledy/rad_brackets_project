@@ -1,17 +1,17 @@
 package highway.cinema.showing.domain
 
-import highway.cinema.showing.domain.inventory.Inventory
-import highway.cinema.showing.domain.inventory.InventoryFactory
+import highway.cinema.showing.domain.inventory.domain.Inventory
+import highway.cinema.showing.domain.inventory.domain.InventoryFactory
 import highway.cinema.showing.domain.movie.Movie
 import highway.cinema.showing.domain.policies.PoliciesForShowing
 import highway.cinema.showing.domain.policies.PremierPolicy
 import highway.cinema.showing.domain.policies.SchedulePolicy
 import highway.cinema.showing.domain.policies.ShowingPoliciesConfiguration
-import highway.cinema.showing.domain.room.Room
-import highway.cinema.showing.domain.room.RoomAvailabilityRepository
+import highway.cinema.showing.domain.room.domain.Room
+import highway.cinema.showing.domain.room.domain.RoomAvailabilityRepository
+import highway.cinema.showing.domain.room.domain.policies.RoomAvailabilityPolicy
+import highway.cinema.showing.domain.room.domain.policies.RoomAvailabilityPolicyConfiguration
 import highway.cinema.showing.domain.room.infrastructure.RoomAvailabilityInfraConfiguration
-import highway.cinema.showing.domain.room.policies.RoomAvailabilityPolicy
-import highway.cinema.showing.domain.room.policies.RoomAvailabilityPolicyConfiguration
 import highway.cinema.showing.infrastructure.ShowingConfiguration
 import java.time.LocalDateTime
 

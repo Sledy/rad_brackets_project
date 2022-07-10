@@ -1,7 +1,7 @@
 package highway.cinema.showing.domain.exception
 
 import highway.cinema.showing.domain.movie.Movie
-import highway.cinema.showing.domain.room.Room
+import highway.cinema.showing.domain.room.domain.Room
 
 internal class RoomUnavailableException private constructor(message: String?) : RuntimeException(message) {
 

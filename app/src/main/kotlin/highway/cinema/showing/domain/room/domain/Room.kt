@@ -1,4 +1,4 @@
-package highway.cinema.showing.domain.room
+package highway.cinema.showing.domain.room.domain
 
 class Room(val roomNumber: Long, val cleaningSlotInMinutes: Long, val roomSeats: Int) {
     override fun equals(other: Any?): Boolean {

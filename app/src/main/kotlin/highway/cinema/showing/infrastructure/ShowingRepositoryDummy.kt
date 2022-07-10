@@ -2,7 +2,7 @@ package highway.cinema.showing.infrastructure
 
 import highway.cinema.showing.domain.Showing
 import highway.cinema.showing.domain.ShowingRepository
-import highway.cinema.showing.domain.room.Room
+import highway.cinema.showing.domain.room.domain.Room
 import java.time.LocalDateTime
 
 internal class ShowingRepositoryDummy : ShowingRepository {

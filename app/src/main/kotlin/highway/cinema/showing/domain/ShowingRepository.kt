@@ -1,6 +1,6 @@
 package highway.cinema.showing.domain
 
-import highway.cinema.showing.domain.room.Room
+import highway.cinema.showing.domain.room.domain.Room
 import java.time.LocalDateTime
 
 

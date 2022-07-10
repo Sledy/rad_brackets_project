@@ -1,4 +1,4 @@
-package highway.cinema.showing.domain.room
+package highway.cinema.showing.domain.room.domain
 
 import java.time.DayOfWeek
 import java.time.LocalTime

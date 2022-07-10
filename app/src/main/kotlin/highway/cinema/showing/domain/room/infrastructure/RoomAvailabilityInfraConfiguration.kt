@@ -1,6 +1,6 @@
 package highway.cinema.showing.domain.room.infrastructure
 
-import highway.cinema.showing.domain.room.RoomAvailabilityRepository
+import highway.cinema.showing.domain.room.domain.RoomAvailabilityRepository
 
 class RoomAvailabilityInfraConfiguration {
 

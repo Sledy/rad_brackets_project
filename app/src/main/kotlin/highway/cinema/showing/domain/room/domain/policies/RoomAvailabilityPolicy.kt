@@ -1,6 +1,6 @@
-package highway.cinema.showing.domain.room.policies
+package highway.cinema.showing.domain.room.domain.policies
 
-import highway.cinema.showing.domain.room.Room
+import highway.cinema.showing.domain.room.domain.Room
 import java.time.LocalDateTime
 
 interface RoomAvailabilityPolicy {

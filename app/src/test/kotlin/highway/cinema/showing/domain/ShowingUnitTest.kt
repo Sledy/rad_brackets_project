@@ -5,7 +5,7 @@ import highway.cinema.showing.domain.exception.PremiereScheduledInForbiddenTime
 import highway.cinema.showing.domain.exception.RoomUnavailableException
 import highway.cinema.showing.domain.inventory.exception.InsufficientItemsInInventoryException
 import highway.cinema.showing.domain.movie.Movie
-import highway.cinema.showing.domain.room.Room
+import highway.cinema.showing.domain.room.domain.Room
 import highway.cinema.showing.infrastructure.ShowingRepositoryDummy
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -33,7 +33,7 @@ internal class ShowingUnitTest {
         val movie = havingSampleMovieWithoutPremiere()
 
         // and
-        val room = havingSampleWithAvailableSeatsEqualTo(100)
+        val room = havingSampleRoomWithAvailableSeatsEqualTo(100)
 
         // and
         val showingTime = LocalDateTime.of(LocalDate.of(2022, Month.JULY, 7), LocalTime.NOON)
@@ -61,7 +61,7 @@ internal class ShowingUnitTest {
         val movie: Movie = havingSampleMovieWithoutPremiere()
 
         // and
-        val room: Room = havingSampleWithAvailableSeatsEqualTo(100)
+        val room: Room = havingSampleRoomWithAvailableSeatsEqualTo(100)
 
         // and
         val showingTime = LocalDateTime.of(LocalDate.of(2022, Month.JANUARY, 1), LocalTime.of(13, 0))
@@ -76,7 +76,7 @@ internal class ShowingUnitTest {
         val movie = havingSampleMovieWithPremiere()
 
         // and
-        val room = havingSampleWithAvailableSeatsEqualTo(100)
+        val room = havingSampleRoomWithAvailableSeatsEqualTo(100)
 
         // and
         val showingTime = LocalDateTime.of(LocalDate.of(2022, Month.JANUARY, 1), LocalTime.of(13, 0))
@@ -92,7 +92,7 @@ internal class ShowingUnitTest {
         val movie = havingSampleMovieWithoutPremiere()
 
         // and
-        val room = havingSampleWithAvailableSeatsEqualTo(1000)
+        val room = havingSampleRoomWithAvailableSeatsEqualTo(1000)
 
         // and
         val showingTime = LocalDateTime.of(LocalDate.of(2022, Month.JANUARY, 1), LocalTime.of(13, 0))
@@ -127,7 +127,7 @@ internal class ShowingUnitTest {
     private fun havingSampleMovieWithoutPremiere() =
         Movie(title = "sample title", is3dMovie = true, hasPremiere = false, durationInMinutes = 120)
 
-    private fun havingSampleWithAvailableSeatsEqualTo(numberOfSeats: Int) = Room(1, 15, numberOfSeats)
+    private fun havingSampleRoomWithAvailableSeatsEqualTo(numberOfSeats: Int) = Room(1, 15, numberOfSeats)
 
 
 }
