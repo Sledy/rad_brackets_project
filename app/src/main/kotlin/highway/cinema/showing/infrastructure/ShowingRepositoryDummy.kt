@@ -1,22 +1,46 @@
 package highway.cinema.showing.infrastructure
 
+import highway.cinema.showing.domain.Showing
 import highway.cinema.showing.domain.ShowingRepository
 import highway.cinema.showing.domain.room.Room
 import java.time.LocalDateTime
 
 internal class ShowingRepositoryDummy : ShowingRepository {
 
+    companion object {
+        val database: MutableMap<String, Showing> = hashMapOf()
+    }
+
     override fun isThereAnyShowingWithRoomForSpecifiedTime(
         showingStartTime: LocalDateTime,
         showingEndTime: LocalDateTime,
         showingRoom: Room
     ): Boolean {
-        if (showingRoom.roomNumber == 1L
-            && showingEndTime == LocalDateTime.MAX
-            && showingStartTime == LocalDateTime.MIN
-        ) {
-            return false
+        return database.values.any { showingFromDatabase ->
+            if (showingFromDatabase.showingStartTime == null || showingFromDatabase.showingEndTime == null) {
+                return false
+            }
+
+            return areDatesOverLapping(
+                showingStartTime,
+                showingEndTime,
+                showingFromDatabase.showingStartTime!!,
+                showingFromDatabase.showingEndTime!!
+            )
         }
-        return true
+    }
+
+
+    private fun areDatesOverLapping(
+        firstDateTimeStart: LocalDateTime,
+        firstDateTimeEnd: LocalDateTime,
+        secondDateTimeStart: LocalDateTime,
+        secondDateTimeEnd: LocalDateTime
+    ): Boolean {
+        return (firstDateTimeStart.isBefore(secondDateTimeStart) && firstDateTimeEnd.isAfter(secondDateTimeStart))
+                || (firstDateTimeStart.isBefore(secondDateTimeEnd) && firstDateTimeEnd.isAfter(secondDateTimeEnd))
+                || (firstDateTimeStart.isBefore(secondDateTimeEnd) && firstDateTimeEnd.isAfter(secondDateTimeEnd))
+                || (firstDateTimeStart.isAfter(secondDateTimeEnd) && firstDateTimeEnd.isBefore(secondDateTimeEnd))
+                || (firstDateTimeStart == secondDateTimeStart && firstDateTimeEnd == secondDateTimeEnd)
     }
 }

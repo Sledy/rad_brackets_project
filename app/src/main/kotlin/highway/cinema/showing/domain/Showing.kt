@@ -15,14 +15,14 @@ import highway.cinema.showing.domain.policies.SchedulePolicy
 import highway.cinema.showing.domain.room.Room
 import highway.cinema.showing.domain.room.policies.RoomAvailabilityPolicy
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class Showing {
 
-    private var room: Room? = null
-    private var movie: Movie? = null
-    private var showingStartTime: LocalDateTime? = null
-    private var showingEndTime: LocalDateTime? = null
+    var room: Room? = null
+    var movie: Movie? = null
+    var showingStartTime: LocalDateTime? = null
+    var showingEndTime: LocalDateTime? = null
 
     @Transient
     private var roomAvailabilityPolicy: RoomAvailabilityPolicy? = null
@@ -40,27 +40,10 @@ class Showing {
     private var schedulePolicy: SchedulePolicy? = null
 
 
-    private var uuid: String = UUID.randomUUID().toString()
+    private val id: String
 
     @Version
     private var version: Long? = null
-
-
-    private constructor(
-        roomAvailabilityPolicy: RoomAvailabilityPolicy,
-        showingRepository: ShowingRepository,
-        inventory: Inventory,
-        premierePolicy: PremierPolicy,
-        schedulePolicy: SchedulePolicy
-    ) {
-        this.roomAvailabilityPolicy = roomAvailabilityPolicy
-        this.showingRepository = showingRepository
-        this.inventory = inventory
-        this.premierePolicy = premierePolicy
-        this.schedulePolicy = schedulePolicy
-    }
-
-    constructor() {}
 
 
     companion object {
@@ -85,27 +68,77 @@ class Showing {
         }
     }
 
+    private constructor(
+        roomAvailabilityPolicy: RoomAvailabilityPolicy,
+        showingRepository: ShowingRepository,
+        inventory: Inventory,
+        premierePolicy: PremierPolicy,
+        schedulePolicy: SchedulePolicy,
+        id: String = UUID.randomUUID().toString()
+    ) {
+        this.id = id
+        this.roomAvailabilityPolicy = roomAvailabilityPolicy
+        this.showingRepository = showingRepository
+        this.inventory = inventory
+        this.premierePolicy = premierePolicy
+        this.schedulePolicy = schedulePolicy
+    }
+
+    constructor(id: String = UUID.randomUUID().toString()) {
+        this.id = id
+    }
+
+    fun initializeAggregateDependencies(
+        roomAvailabilityPolicy: RoomAvailabilityPolicy,
+        showingRepository: ShowingRepository,
+        inventory: Inventory,
+        premierePolicy: PremierPolicy,
+        schedulePolicy: SchedulePolicy
+    ) {
+        this.roomAvailabilityPolicy = roomAvailabilityPolicy
+        this.showingRepository = showingRepository
+        this.inventory = inventory
+        this.premierePolicy = premierePolicy
+        this.schedulePolicy = schedulePolicy
+    }
+
 
     private fun scheduleShowing(movie: Movie, showingStartTime: LocalDateTime, showingRoom: Room) {
-        if (movie.hasPremiere) {
-            validatePremiereRequirements(movie, showingStartTime)
-        } else {
-            val schedulePolicyIsNotViolated: Boolean = schedulePolicy?.validateSchedulingDateTime(
-                showingStartTime, getEndShowingTimeFrom(showingStartTime, movie)
-            ) ?: throw UnexpectedException("Schedule Policy has been not initialized")
-            if (!schedulePolicyIsNotViolated) {
-                throw SchedulingPolicyViolatedException.with(schedulePolicy?.getPolicyTimeRange()!!)
-            }
-        }
+        checkShowingTimeRequirements(movie, showingStartTime)
 
         validateRoomAvailability(movie, showingStartTime, showingRoom)
 
+        check3dMovieRequirements(movie, showingRoom)
+
+        assignShowingParameters(showingRoom, movie, showingStartTime)
+    }
+
+    private fun check3dMovieRequirements(
+        movie: Movie,
+        showingRoom: Room
+    ) {
         if (movie.is3dMovie) {
             inventory?.reserveItems(ItemType.GLASSES, showingRoom.roomSeats)
                 ?: throw UnexpectedException("Inventory has not been initialized inside Showing class")
         }
+    }
 
-        assignShowingParameters(showingRoom, movie, showingStartTime)
+    private fun checkShowingTimeRequirements(
+        movie: Movie,
+        showingStartTime: LocalDateTime
+    ) {
+        if (movie.hasPremiere) {
+            validatePremiereRequirements(movie, showingStartTime)
+            return
+        }
+        val schedulePolicyIsNotViolated: Boolean = schedulePolicy?.validateSchedulingDateTime(
+            showingStartTime, getEndShowingTimeFrom(showingStartTime, movie)
+        ) ?: throw UnexpectedException("Schedule Policy has been not initialized")
+
+        if (!schedulePolicyIsNotViolated) {
+            throw SchedulingPolicyViolatedException.with(schedulePolicy?.getPolicyTimeRange()!!)
+        }
+
     }
 
     private fun assignShowingParameters(
@@ -118,20 +151,32 @@ class Showing {
     }
 
     private fun validateRoomAvailability(movie: Movie, showingStartTime: LocalDateTime, showingRoom: Room) {
-        if (this.checkIfRoomIsAvailableForMovieInSpecifiedTime(movie, showingStartTime, showingRoom)) {
+        if (!this.roomIsUnavailableForTheShowing(movie, showingStartTime, showingRoom)) {
             throw RoomUnavailableException.with(movie, showingRoom)
         }
     }
 
 
-    private fun checkIfRoomIsAvailableForMovieInSpecifiedTime(
+    private fun roomIsUnavailableForTheShowing(
         movie: Movie, showingStartTime: LocalDateTime, showingRoom: Room
     ): Boolean {
-        val isAnyShowingAtThisTimeAndRoom: Boolean = this.showingRepository?.isThereAnyShowingWithRoomForSpecifiedTime(
-            showingStartTime, showingStartTime.minusMinutes(movie.durationInMinutes), showingRoom
-        ) ?: throw UnexpectedException("Showing repository has not been initialized for Showing class")
 
-        return !isAnyShowingAtThisTimeAndRoom
+        val canRoomBeReservedInThisTime: () -> Boolean = {
+            roomAvailabilityPolicy?.isRoomAvailableFor(
+                showingStartTime,
+                showingStartTime.plusMinutes(movie.durationInMinutes),
+                showingRoom
+            ) ?: false
+        }
+
+
+        val isAnyShowingAtThisTimeAndRoom: () -> Boolean = {
+            this.showingRepository?.isThereAnyShowingWithRoomForSpecifiedTime(
+                showingStartTime, showingStartTime.minusMinutes(movie.durationInMinutes), showingRoom
+            ) ?: throw UnexpectedException("Showing repository has not been initialized for Showing class")
+        }
+
+        return canRoomBeReservedInThisTime.invoke() && !isAnyShowingAtThisTimeAndRoom.invoke()
     }
 
     private fun getOccupationEndTimeFrom(showingStartTime: LocalDateTime, movie: Movie, room: Room): LocalDateTime {
@@ -152,13 +197,26 @@ class Showing {
         if (premiereRequirementsViolated) {
             throw PremiereScheduledInForbiddenTime.with(premiereTimeRange)
         }
-
     }
 
     private fun getEndShowingTimeFrom(
         showingStartTime: LocalDateTime, movie: Movie
     ) = showingStartTime.plusMinutes(movie.durationInMinutes)
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Showing
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 }
 
 
